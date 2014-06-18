@@ -7,5 +7,7 @@ if (target == "altera"):
 	modules = {"local" : ["altera", "generic", "common"]}
 elif (target == "xilinx" and syn_device[0:4].upper()=="XC6V"):
 	modules = {"local" : ["xilinx", "xilinx/virtex6", "common"]}
+elif (target == "xilinx" and syn_device[0:3].upper()=="XC7"):
+	modules = {"local" : ["xilinx", "xilinx/series7", "common"]}]}
 elif (target == "xilinx"):
 	modules = {"local" : ["xilinx", "generic", "common"]}
