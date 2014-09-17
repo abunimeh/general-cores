@@ -126,6 +126,7 @@ architecture syn of generic_async_fifo is
     generic (
       g_data_width             : natural;
       g_size                   : natural;
+      g_show_ahead             : boolean;
       g_dual_clock             : boolean;
       g_almost_empty_threshold : integer;
       g_almost_full_threshold  : integer);
@@ -201,6 +202,7 @@ begin  -- syn
       generic map (
         g_data_width             => g_data_width,
         g_size                   => g_size,
+        g_show_ahead             => g_show_ahead,
         g_dual_clock             => true,
         g_almost_empty_threshold => f_empty_thr(g_with_rd_almost_empty, g_almost_empty_threshold, g_size),
         g_almost_full_threshold  => f_empty_thr(g_with_wr_almost_full, c_virtex_almost_full_thr, g_size))

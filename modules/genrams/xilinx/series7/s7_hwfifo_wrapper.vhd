@@ -38,6 +38,7 @@ entity s7_hwfifo_wrapper is
   generic (
     g_data_width : natural;
     g_size       : natural;
+    g_show_ahead : boolean := false;
     g_dual_clock : boolean;
     -- Read-side flag selection
 
@@ -108,6 +109,11 @@ architecture syn of s7_hwfifo_wrapper is
 
 begin  -- syn
 
+  -- We can only make a FWFT FIFO if EN_SYN is false
+  assert g_show_ahead and g_dual_clock
+  report "generic_sync_fifo[xilinx]: if g_show_ahead is true, g_dual clock must be too"
+  severity error;
+
   srst <= not rst_n_i;
 
   -- This can only be used if DO_REG = 1 and EN_SYN = TRUE, which is never the case
@@ -135,8 +141,8 @@ begin  -- syn
         DO_REG                  => f_bool_2_int(g_dual_clock),
         EN_SYN                  => not g_dual_clock,
         FIFO_MODE               => f_s7_fifo_mode(m),
-        FIRST_WORD_FALL_THROUGH => false,
-	SIM_DEVICE		=> "7SERIES")
+        FIRST_WORD_FALL_THROUGH => g_show_ahead,
+        SIM_DEVICE              => "7SERIES")
       port map (
         ALMOSTEMPTY   => rd_almost_empty_o,
         ALMOSTFULL    => wr_almost_full_o,
@@ -186,8 +192,8 @@ begin  -- syn
         DO_REG                  => f_bool_2_int(g_dual_clock),
         EN_SYN                  => not g_dual_clock,
         FIFO_MODE               => f_s7_fifo_mode(m),
-        FIRST_WORD_FALL_THROUGH => false,
-	SIM_DEVICE		=> "7SERIES")
+        FIRST_WORD_FALL_THROUGH => g_show_ahead,
+	    SIM_DEVICE              => "7SERIES")
       port map (
         ALMOSTEMPTY => rd_almost_empty_o,
         ALMOSTFULL  => wr_almost_full_o,
