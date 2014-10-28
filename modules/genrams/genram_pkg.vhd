@@ -153,6 +153,7 @@ package genram_pkg is
       g_with_wr_almost_empty   : boolean := false;
       g_with_wr_almost_full    : boolean := false;
       g_with_wr_count          : boolean := false;
+      g_with_fifo_inferred     : boolean := false;
       g_almost_empty_threshold : integer := 0;
       g_almost_full_threshold  : integer := 0);
     port (
@@ -186,6 +187,7 @@ package genram_pkg is
       g_with_almost_empty      : boolean := false;
       g_with_almost_full       : boolean := false;
       g_with_count             : boolean := false;
+      g_with_fifo_inferred     : boolean := false;
       g_almost_empty_threshold : integer := 0;
       g_almost_full_threshold  : integer := 0);
     port (
