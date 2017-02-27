@@ -7,6 +7,7 @@
 --              Theodor-Adrian Stana
 --              Matthieu Cattin
 --              Dimitrios Lampridis
+--              Evangelia Gousiou
 -- Company    : CERN
 -- Created    : 2009-09-01
 -- Last update: 2016-11-29
@@ -14,8 +15,8 @@
 -- Standard   : VHDL '93
 -------------------------------------------------------------------------------
 -- Description:
--- Package incorporating simple VHDL modules and functions, which are used
--- in the WR and other OHWR projects.
+-- Package incorporating simple VHDL modules and functions, which 
+-- are used in the WR and other OHWR projects.
 -------------------------------------------------------------------------------
 --
 -- Copyright (c) 2009-2016 CERN
@@ -36,6 +37,14 @@
 -- Public License along with this source; if not, download it
 -- from http://www.gnu.org/licenses/lgpl-2.1.html
 --
+-------------------------------------------------------------------------------
+-- Revisions  :
+-- Date        Version  Author          Description
+-- 2009-09-01  0.9      twlostow        Created
+-- 2011-04-18  1.0      twlostow        Added comments & header
+-- 2013-11-20  1.1      tstana          Added glitch filter and I2C slave
+-- 2014-03-14  1.2      mcattin         Added dynamic glitch filter
+-- 2014-03-20  1.3      mcattin         Added bicolor led controller
 -------------------------------------------------------------------------------
 
 library ieee;
@@ -321,7 +330,7 @@ package gencores_pkg is
   constant c_i2cs_rd_done   : std_logic_vector(1 downto 0) := "10";
   constant c_i2cs_wr_done   : std_logic_vector(1 downto 0) := "11";
 
-  component gc_i2c_slave is
+ component gc_i2c_slave is
     generic
       (
         -- Length of glitch filter
@@ -504,6 +513,48 @@ package gencores_pkg is
       signals_pN_o                 : out std_logic_vector(g_signal_num-1 downto 0));
   end component;
 
+ ------------------------------------------------------------------------------
+  -- Priority encoder
+  ------------------------------------------------------------------------------  
+  component gc_prio_encoder is
+  generic (
+    g_width : integer);
+  port (
+    d_i     : in  std_logic_vector(g_width-1 downto 0);
+    therm_o : out std_logic_vector(g_width-1 downto 0));
+  end component;
+
+  ------------------------------------------------------------------------------
+  -- Delay generator
+  ------------------------------------------------------------------------------
+  component gc_delay_gen is
+  generic(
+    g_delay_cycles : in natural;
+    g_data_width   : in natural);
+
+  port(clk_i   : in  std_logic;  
+       rst_n_i : in  std_logic;  
+       d_i     : in  std_logic_vector(g_data_width - 1 downto 0);
+       q_o     : out std_logic_vector(g_data_width - 1 downto 0));
+  end component;
+
+  ------------------------------------------------------------------------------
+  -- One-wire interface to DS1820 and DS1822
+  ------------------------------------------------------------------------------  
+  component gc_ds182x_interface is
+  generic
+    (freq      : integer := 40);
+  port
+    (clk_i     : in    std_logic;
+     rst_n_i   : in    std_logic;
+     pps_p_i   : in    std_logic;
+     onewire_b : inout std_logic;
+     id_o      : out   std_logic_vector(63 downto 0);
+     temper_o  : out   std_logic_vector(15 downto 0);
+     id_read_o : out   std_logic;
+     id_ok_o   : out   std_logic);
+  end component;
+
   --============================================================================
   -- Procedures and functions
   --============================================================================
@@ -633,7 +684,7 @@ package body gencores_pkg is
     end if;
   end;
 
-  ------------------------------------------------------------------------------
+------------------------------------------------------------------------------
   -- Converts a boolean to natural integer (false -> 0, true -> 1)
   ------------------------------------------------------------------------------
   function f_bool2int (b : boolean) return natural is
@@ -656,5 +707,6 @@ package body gencores_pkg is
       return true;
     end if;
   end;
+
 
 end gencores_pkg;
